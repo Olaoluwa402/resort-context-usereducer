@@ -12,7 +12,7 @@ const Rooms = () => {
         <Header title='Available Rooms'/>
    <div style={{display:'flex', justifyContent:'center', alignItems:'center', flexWrap:'wrap'}}>
    {
-            filteredRooms.map((room) => <Room key={room.id} room={room}/>)
+            filteredRooms && filteredRooms.length > 0 ? filteredRooms.map((room) => <Room key={room.id} room={room}/>) : (<h2>No room found</h2>)
         }
    </div>
     </div>

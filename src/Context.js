@@ -14,6 +14,7 @@ const Provider = ({children}) => {
          price: 0,
          maxPrice:0,
          maxSize:0,
+         minSize:0,
          capacity: 1,
          pets: false,
          breakfast: false,
@@ -28,7 +29,7 @@ const Provider = ({children}) => {
          const temptRooms = [...Data]
         //  console.log(temptRooms)
          let rooms = temptRooms.map((room) => {
-             let newRoom = {
+             let newRoom = { 
                 id: room.sys.id,
                 ...room.fields,
                 images: room.fields.images.map((img) => img.fields.file.url)
@@ -43,6 +44,7 @@ const Provider = ({children}) => {
         
          const sizes = rooms.map((room)=> room.size)
          const maxSize = Math.max(...sizes)
+         const minSize = Math.min(...sizes)
 
          console.log(maxSize, maxPrice)
 
@@ -55,6 +57,7 @@ const Provider = ({children}) => {
             loading:false,
             maxPrice,
             maxSize,
+            minSize,
             price:maxPrice
          })
 
@@ -62,25 +65,57 @@ const Provider = ({children}) => {
      }
 
      const changeHandler = (e) =>{
-       const {value,name,type} = e.target
-       console.log(value, name, type)
-
+      //  const {value,name} = e.target
+      //  console.log(value, name)
+      const type = e.target.type
+      const name = e.target.name;
+      const value = type === 'checkbox' ? e.target.checked : e.target.value;
+       console.log(name, value)
        setState({
          ...state,
          [name]:value
        })
 
-       if(type !== 'all'){
-         const copy = [...state.rooms]
+       let filteredRM = [...state.rooms]
+       console.log(filteredRM)
+
+       if(name === 'type' && value !== 'all'){
          // console.log('filtecopy', copy)
-          const filtered = copy.filter((room) => room.type === value)
+          filteredRM = filteredRM.filter((room) => room.type === value)
          //  console.log('filtered', filtered)
-          setState({
-            ...state,
-            filteredRooms:filtered
-          })
        }
+
+       if(name === 'capacity' && parseInt(value) !== 1){
+         // console.log('filtecopy', copy)
+          filteredRM = filteredRM.filter((room) => room.capacity === parseInt(value))
+         //  console.log('filtered', filtered)
+       }
+
+       if(name === 'price' ){
+         // console.log('filtecopy', copy)
+          filteredRM = filteredRM.filter((room) => room.price <= state.price && room.price <= state.maxPrice)
+         //  console.log('filtered', filtered)
+       }
+         // console.log('filtecopy', copy)
+          filteredRM = filteredRM.filter((room) => room.size >= parseInt(state.minSize) && room.size <=  parseInt(state.maxSize))
+         //  console.log('filtered', filtered)
+       
+         if(type === 'checkbox'){
+            filteredRM = filteredRM.filter((room) => room.pets === true && room.breakfast === true)
+         }
+
+
+         setState((prev)=> ({
+            ...prev,
+            filteredRooms:filteredRM
+         }))
+      //  setState({
+      //    ...state,
+      //    filteredRooms:filteredRM
+      //  })
      }
+
+   //   console.log(state)
 
 // console.log(state)
      const getSingleRoom = (slug) => {
